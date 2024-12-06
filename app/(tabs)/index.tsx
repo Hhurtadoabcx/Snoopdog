@@ -1,74 +1,96 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather'; // Usamos react-native-vector-icons para los íconos
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
+const PetApp = () => {
+  const [activeTab, setActiveTab] = useState('pets');
+  
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
+    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+      {/* Header */}
+      <View style={{ backgroundColor: '#6b21a8', padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Icon name="menu" size={24} color="white" />
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', marginLeft: 8 }}>PetCare</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Icon name="search" size={24} color="white" style={{ marginRight: 16 }} />
+          <Icon name="user" size={24} color="white" />
+        </View>
+      </View>
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+      {/* Main Content */}
+      <ScrollView contentContainerStyle={{ flex: 1, padding: 16 }}>
+        {activeTab === 'pets' && (
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <Text style={{ fontSize: 18, fontWeight: '600' }}>Mis Mascotas</Text>
+              <TouchableOpacity style={{ backgroundColor: '#6b21a8', padding: 10, borderRadius: 50 }}>
+                <Icon name="plus" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Pet Card Example */}
+            <View style={{ backgroundColor: 'white', padding: 16, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 64, height: 64, backgroundColor: '#e5e7eb', borderRadius: 32 }}></View>
+                <View style={{ marginLeft: 16 }}>
+                  <Text style={{ fontWeight: '600' }}>Max</Text>
+                  <Text style={{ color: '#6b7280' }}>Labrador • 3 años</Text>
+                  <Text style={{ color: '#6b21a8' }}>Próxima vacuna: 15 días</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {activeTab === 'marketplace' && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            <View style={{ width: '48%', backgroundColor: 'white', padding: 16, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3, marginBottom: 16 }}>
+              <View style={{ width: '100%', height: 120, backgroundColor: '#e5e7eb', borderRadius: 8, marginBottom: 8 }}></View>
+              <Text style={{ fontWeight: '600' }}>Alimento Premium</Text>
+              <Text style={{ color: '#6b7280' }}>$29.99</Text>
+            </View>
+          </View>
+        )}
+
+        {activeTab === 'vaccines' && (
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 16 }}>Registro de Vacunas</Text>
+            <View style={{ backgroundColor: 'white', padding: 16, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View>
+                  <Text style={{ fontWeight: '600' }}>Rabia</Text>
+                  <Text style={{ color: '#6b7280' }}>Última: 12/01/2024</Text>
+                </View>
+                <TouchableOpacity>
+                  <Icon name="plus" size={24} color="#6b21a8" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Navigation Bar */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingVertical: 12 }}>
+        <TouchableOpacity onPress={() => setActiveTab('pets')} style={{ alignItems: 'center' }}>
+          <Icon name="dog" size={24} color={activeTab === 'pets' ? '#6b21a8' : '#6b7280'} />
+          <Text style={{ fontSize: 12, color: activeTab === 'pets' ? '#6b21a8' : '#6b7280' }}>Mascotas</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => setActiveTab('marketplace')} style={{ alignItems: 'center' }}>
+          <Icon name="shopping-bag" size={24} color={activeTab === 'marketplace' ? '#6b21a8' : '#6b7280'} />
+          <Text style={{ fontSize: 12, color: activeTab === 'marketplace' ? '#6b21a8' : '#6b7280' }}>Tienda</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => setActiveTab('vaccines')} style={{ alignItems: 'center' }}>
+          <Icon name="syringe" size={24} color={activeTab === 'vaccines' ? '#6b21a8' : '#6b7280'} />
+          <Text style={{ fontSize: 12, color: activeTab === 'vaccines' ? '#6b21a8' : '#6b7280' }}>Vacunas</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export default PetApp;
