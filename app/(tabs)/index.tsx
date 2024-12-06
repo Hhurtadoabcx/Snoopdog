@@ -1,47 +1,87 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import Login from '@/components/Login';;       // Asegúrate de que las rutas de importación sean correctas
+// App.js
+
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import Login from '@/components/Login';
 import Register from '@/components/Register';
 import PetApp from '@/components/PetApp';
+import PetForm from '@/components/PetForm';
+import { auth } from '../../firebase-config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState<'Login' | 'Register' | 'PetApp'>('Login');
+  // Estado para manejar la pantalla actual
+  const [currentScreen, setCurrentScreen] = useState('Loading');
+  const [loading, setLoading] = useState(true);
 
-  // Función para manejar el éxito en el inicio de sesión
-  const handleLoginSuccess = () => {
-    setCurrentScreen('PetApp');
-  };
+  useEffect(() => {
+    // Listener para el estado de autenticación
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentScreen('PetApp');
+      } else {
+        setCurrentScreen('Login');
+      }
+      setLoading(false);
+    });
 
-  // Función para manejar el éxito en el registro
-  const handleRegisterSuccess = () => {
-    setCurrentScreen('PetApp');
-  };
+    return () => unsubscribe(); // Limpiar el listener al desmontar el componente
+  }, []);
 
-  // Función para navegar a la pantalla de registro
+  // Funciones para manejar la navegación
   const navigateToRegister = () => {
     setCurrentScreen('Register');
   };
 
-  // Función para navegar a la pantalla de login
   const navigateToLogin = () => {
     setCurrentScreen('Login');
   };
+
+  const navigateToPetApp = () => {
+    setCurrentScreen('PetApp');
+  };
+
+  const navigateToPetForm = () => {
+    setCurrentScreen('PetForm');
+  };
+
+  const handlePetAdded = () => {
+    setCurrentScreen('PetApp');
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6b21a8" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       {currentScreen === 'Login' && (
         <Login
           onNavigateToRegister={navigateToRegister}
-          onLoginSuccess={handleLoginSuccess}
+          onLoginSuccess={navigateToPetApp}
         />
       )}
       {currentScreen === 'Register' && (
         <Register
           onNavigateToLogin={navigateToLogin}
-          onRegisterSuccess={handleRegisterSuccess}
+          onRegisterSuccess={navigateToPetApp}
         />
       )}
-      {currentScreen === 'PetApp' && <PetApp />}
+      {currentScreen === 'PetApp' && (
+        <PetApp
+          onAddPet={navigateToPetForm} // Pasar función para abrir PetForm
+        />
+      )}
+      {currentScreen === 'PetForm' && (
+        <PetForm
+          onCancel={navigateToPetApp} // Pasar función para cancelar y volver a PetApp
+          onPetAdded={handlePetAdded} // Pasar función para volver a PetApp después de añadir
+        />
+      )}
     </View>
   );
 };
@@ -49,6 +89,11 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

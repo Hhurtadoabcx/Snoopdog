@@ -1,14 +1,68 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+// PetForm.js
 
-const PetForm = ({ onCancel }) => {
-  const [name, setName] = useState('');
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { firestore, auth } from '../firebase-config'; // Asegúrate de que la ruta sea correcta
+import { collection, addDoc } from 'firebase/firestore';
+
+const PetForm = ({ onCancel, onPetAdded }) => { // Añadimos onPetAdded como prop
+  const [petName, setPetName] = useState('');
   const [breed, setBreed] = useState('');
   const [weight, setWeight] = useState('');
-  const [petName, setPetName] = useState('');
+  const [age, setAge] = useState('');
 
-  const handleSubmit = () => {
-    console.log('Mascota añadida:', { name, breed, weight, petName });
+  const handleSubmit = async () => {
+    // Validaciones básicas
+    if (!petName || !breed || !weight || !age) {
+      Alert.alert('Error', 'Todos los campos son obligatorios.');
+      return;
+    }
+
+    if (isNaN(weight) || isNaN(age)) {
+      Alert.alert('Error', 'El peso y la edad deben ser números.');
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        Alert.alert('Error', 'No hay un usuario autenticado.');
+        return;
+      }
+
+      // Referencia a la colección 'pets'
+      const petsCollection = collection(firestore, 'pets');
+
+      // Datos de la mascota
+      const petData = {
+        petName,
+        breed,
+        weight: parseFloat(weight),
+        age: parseInt(age, 10),
+        ownerID: user.uid, // Asigna la ID del dueño
+        createdAt: new Date()
+      };
+
+      // Añadir documento a Firestore
+      await addDoc(petsCollection, petData);
+
+      Alert.alert('Éxito', 'Mascota añadida correctamente.');
+
+      // Invocar la función de callback para actualizar la pantalla
+      if (onPetAdded) {
+        onPetAdded();
+      }
+
+      // Opcional: Limpiar campos
+      setPetName('');
+      setBreed('');
+      setWeight('');
+      setAge('');
+    } catch (error) {
+      console.error('Error al añadir la mascota:', error);
+      Alert.alert('Error', 'No se pudo añadir la mascota. Intenta nuevamente.');
+    }
   };
 
   return (
@@ -40,8 +94,9 @@ const PetForm = ({ onCancel }) => {
       <TextInput
         style={styles.input}
         placeholder="Edad en años"
-        value={name}
-        onChangeText={setName}
+        value={age}
+        onChangeText={setAge}
+        keyboardType="numeric"
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -73,6 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 10,
     borderRadius: 8,
+    backgroundColor: 'white',
   },
   button: {
     backgroundColor: '#6b21a8',
